@@ -1,1 +1,1 @@
-app -> composeapp -> androidTest
+app -> composeapp -> kotlin+java -> androidTest
