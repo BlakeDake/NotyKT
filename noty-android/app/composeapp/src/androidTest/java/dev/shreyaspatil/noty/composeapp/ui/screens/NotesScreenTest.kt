@@ -210,18 +210,48 @@ class NotesScreenTest : NotyScreenTest() {
         setNotyContent { NotesScreen() }
 
         registerIdlingResource(prefillNotes())
-        registerIdlingResource(pinNotes("49", "50"))
+
+        registerIdlingResource(object : IdlingResource {
+            override var isIdleNow: Boolean = false
+
+            init {
+                GlobalScope.launch {
+                    noteRepository.pinNote("49", true)
+                    noteRepository.pinNote("50", true)
+                    delay(2000)
+                    isIdleNow = true
+                }
+            }
+        })
 
         waitForIdle()
 
-        // Scroll to the top of screen
+        // Scorriamo all'inizio della lista
         onNodeWithTag("notesList").performScrollToIndex(0)
         waitForIdle()
 
-        // Pinned notes should be displayed on top of screen
+        // Le note fissate dovrebbero essere visualizzate in cima
         onNodeWithText("Lorem Ipsum 49").assertIsDisplayed()
         onNodeWithText("Lorem Ipsum 50").assertIsDisplayed()
     }
+
+//    @Test
+//    fun showPinnedNotesFirst_whenPinnedNotesArePresent() = runTest {
+//        setNotyContent { NotesScreen() }
+//
+//        registerIdlingResource(prefillNotes())
+//        registerIdlingResource(pinNotes("49", "50"))
+//
+//        waitForIdle()
+//
+//        // Scroll to the top of screen
+//        onNodeWithTag("notesList").performScrollToIndex(0)
+//        waitForIdle()
+//
+//        // Pinned notes should be displayed on top of screen
+//        onNodeWithText("Lorem Ipsum 49").assertIsDisplayed()
+//        onNodeWithText("Lorem Ipsum 50").assertIsDisplayed()
+//    }
 
     @Composable
     private fun NotesScreen(
